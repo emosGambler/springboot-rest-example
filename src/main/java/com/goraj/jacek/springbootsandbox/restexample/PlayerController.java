@@ -13,8 +13,10 @@ import java.util.stream.Collectors;
 public class PlayerController {
 
     private final PlayerRepository repository;
+    private final PlayerModelAsembler assembler;
 
-    PlayerController(PlayerRepository repository) {
+    PlayerController(PlayerRepository repository, PlayerModelAsembler assembler) {
+        this.assembler = assembler;
         this.repository = repository;
     }
 
@@ -23,9 +25,7 @@ public class PlayerController {
     @GetMapping(path = "/players")
     public CollectionModel<EntityModel<Player>> getPlayers() {
         List<EntityModel<Player>> players = repository.findAll().stream()
-                .map(player -> new EntityModel<>(player,
-                        linkTo(methodOn(PlayerController.class).getPlayers()).withSelfRel(),
-                        linkTo(methodOn(PlayerController.class).getPlayers()).withRel("players")))
+                .map(assembler::toModel)
                 .collect(Collectors.toList());
         return new CollectionModel(players,
                 linkTo(methodOn(PlayerController.class).getPlayers()).withSelfRel());
@@ -35,9 +35,7 @@ public class PlayerController {
     public EntityModel<Player> getPlayer(@PathVariable Long id) {
         Player player = repository.findById(id).orElseThrow(() -> new PlayerNotFoundException(id));
 
-        return new EntityModel<>(player,
-                linkTo(methodOn(PlayerController.class).getPlayer(id)).withSelfRel(),
-                linkTo(methodOn((PlayerController.class)).getPlayers()).withRel("players"));
+        return assembler.toModel(player);
     }
 
     @PostMapping(path = "/players", consumes = "application/json", produces = "application/json")
