@@ -41,6 +41,7 @@ public class PlayerController {
     @PostMapping(path = "/players", consumes = "application/json", produces = "application/json")
     public EntityModel<Player> newPlayer(@RequestBody Player player) {
         repository.save(player);
+
         return new EntityModel<>(player,
                 linkTo(methodOn(PlayerController.class).newPlayer(player)).withSelfRel());
     }
