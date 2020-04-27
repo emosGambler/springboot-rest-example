@@ -1,6 +1,7 @@
 package com.goraj.jacek.springbootsandbox.restexample;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
+import com.google.common.collect.Sets;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +42,6 @@ public class PlayerController {
     @PostMapping(path = "/players", consumes = "application/json", produces = "application/json")
     public EntityModel<Player> newPlayer(@RequestBody Player player) {
         repository.save(player);
-
         return new EntityModel<>(player,
                 linkTo(methodOn(PlayerController.class).newPlayer(player)).withSelfRel());
     }
